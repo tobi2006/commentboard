@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title> Commentboard {% block title %}{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="author" content="Tobias Kliem">
+    {# <link rel="shortcut icon" href="{{ STATIC_URL }}images/favicon.ico" /> #}
+    <link href="/static/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/static/css/jquery.qtip.min.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+    {% block style %}
+    {% endblock %}
+    </style>
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+{% block navbar %}
+{% endblock %}
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/bootstrap-datepicker.js"></script>
+
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>
