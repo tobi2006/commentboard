@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}{{ board.title }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header" align="center">
+    <h1>Set Up a New Board</h1>
+</div>
+<br><br>
+<form action="" method="POST" class="form-horizontal">
+
+<div class="form-group">
+    <div class="col-sm-2">
+        <label for="title">
+            Title
+        </label>
+    </div>
+    <div class="col-sm-8">
+        <input type="text" name="title" class="form-control" placeholder="eg Hunting Laws - Lecture 2" id="title">
+    </div>
+    <div class="col-sm-4">
+        <span class="help-block" id="title-info"></span>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-2">
+        <label for="slug">
+            Short Title
+        </label>
+    </div>
+    <div class="col-sm-5">
+        <input type="text" name="slug" class="form-control" placeholder="eg hunting_laws_2" id="slug">
+    </div>
+    <div class="col-sm-6">
+        <span class="help-block" id="slug-info"></span>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-2">
+        <label for="password">
+            Password for Posting
+        </label>
+    </div>
+    <div class="col-sm-5">
+        <input type="text" name="password" class="form-control" placeholder="eg Hl2014-2" id="password">
+    </div>
+    <div class="col-sm-6">
+        <span class="help-block" id="password-info"></span>
+    </div>
+</div>
+<br><hr><br>
+<div class="form-group">
+    <div class="col-sm-2">
+        <label for="opening_date">
+            Open from
+        </label>
+    </div>
+    <div class="col-sm-2">
+        <input type="text" name="opening_date" class="form-control slot_date" data-date-format="dd/mm/yyyy" placeholder="eg 20/6/1980" id="opening_date">
+    </div>
+    <div class="col-sm-2">
+        <input type="text" name="opening_time" class="form-control" placeholder="eg 9:00" id="opening_time">
+    </div>
+    <div class="col-sm-6">
+        <span class="help-block" id="opening-info"></span>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-2">
+        <label for="closing_date">
+            Until
+        </label>
+    </div>
+    <div class="col-sm-2">
+        <input type="text" name="closing_date" class="form-control slot_date" data-date-format="dd/mm/yyyy" placeholder="eg 20/6/1980" id="closing_date">
+    </div>
+    <div class="col-sm-2">
+        <input type="text" name="closing_time" class="form-control" placeholder="eg 18:00" id="closing_time">
+    </div>
+    <div class="col-sm-6">
+        <span class="help-block" id="closing-info"></span>
+    </div>
+</div>
+
+<button id="submit" type="submit" value="Save" class="btn btn-default" align="right" disabled>Set Up Board</button>
+
+{% csrf_token %}
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        function sameOrigin(url) {
+            // test that a given url is a same-origin URL
+            // url could be relative or scheme relative or absolute
+            var host = document.location.host; // host + port
+            var protocol = document.location.protocol;
+            var sr_origin = '//' + host;
+            var origin = protocol + sr_origin;
+            // Allow absolute or scheme relative URLs to same origin
+            return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                // or any other URL that isn't scheme relative or absolute i.e relative.
+                !(/^(\/\/|http:|https:).*/.test(url));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                var csrftoken = '{{ csrf_token }}';
+                if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                    // Send the token to same-origin, relative URLs only.
+                    // Send the token only if the method warrants CSRF protection
+                    // Using the CSRFToken value acquired earlier
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        function isValidDate(txtDate){
+            var currVal = txtDate;
+            if(currVal == '')
+                {
+                return false;
+                };
+            //Declare Regex 
+            var rxDatePattern = /^(\d{1,2})(\/|-)(\d{1,2})(\/|-)(\d{4})$/;
+            var dtArray = currVal.match(rxDatePattern); // is format OK?
+            if (dtArray == null)
+                {
+                return false;
+                };
+            //Checks for mm/dd/yyyy format.
+            dtDay= dtArray[1];
+            dtMonth = dtArray[3];
+            dtYear = dtArray[5];
+            if (dtMonth < 1 || dtMonth > 12)
+                {
+                return false;
+                }
+            else if (dtDay < 1 || dtDay > 31)
+                {
+                return false;
+                }
+            else if ((dtMonth==4 || dtMonth==6 || dtMonth==9 || dtMonth==11) && dtDay ==31)
+            {
+                return false;
+            }
+            else if (dtMonth == 2)
+            {
+                var isleap = (dtYear % 4 == 0 && (dtYear % 100 != 0 || dtYear % 400 == 0));
+                if (dtDay> 29 || (dtDay ==29 && !isleap))
+                {
+                return false;
+                };
+            };
+            return true;
+        };
+
+
+        function validateForm(){
+            var title = $("#title").val();
+            var slug = $("#slug").val();
+            var form_clean = true;
+            if (title.length < 100)
+            {
+                $("#title-info").text('');
+            }
+            else
+            {
+                $("#title-info").text('This title is too long');
+                var form_clean = false;
+            };
+            if (form_clean == true)
+            {
+                if (slug.length == 0)
+                {
+                    $("#slug-info").text("This field is required");
+                    var form_clean = false;
+                }
+            };
+            var opening_date = $("#opening_date").val();
+            if (isValidDate(opening_date))
+            {
+                $("#opening-info").text("");
+                var form_clean = true;
+            }
+            else
+            {
+                $("#opening-info").text("This is not a valid date");
+                var form_clean = false;
+            };
+            var closing_date = $("#closing_date").val();
+            if (isValidDate(closing_date))
+            {
+                $("#closing-info").text("");
+                var form_clean = true;
+            }
+            else
+            {
+                $("#closing-info").text("This is not a valid date");
+                var form_clean = false;
+            };
+            //Other validation here!
+            if (form_clean == true)
+            {
+                $.post("/set_up_board/",
+                    {'slug':slug},
+                    function(available) {
+                        switch(available)
+                        {
+                            case 'invalid':
+                                $("#slug-info").text('You can only use alphanumeric characters and "_-~"');
+                                $("#submit").prop('disabled', true);
+                                break;
+                            case 'taken':
+                                $("#slug-info").text('This name is already taken.');
+                                $("#submit").prop('disabled', true);
+                                break;
+                            case 'available':
+                                $("#slug-info").text("");
+                                $("#submit").prop('disabled', false);
+                                break;
+                        };
+                    });
+            }
+            else
+            {
+                $("#submit").prop('disabled', true);
+            };
+        };
+
+        $('#slug').keyup(function (){
+            validateForm();
+        });
+
+        $('#title').keyup(function (){
+            validateForm();
+        });
+
+        $('.slot_date').datepicker();
+
+    });
+
+</script>
+{% endblock %}
