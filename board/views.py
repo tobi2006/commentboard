@@ -83,41 +83,41 @@ def home(request):
 
 def show_board(request, slug):
     board = Board.objects.get(slug = slug)
-    messages = Message.objects.filter(belongs_to = board)
+    comments = Comment.objects.filter(belongs_to = board)
     if request.is_ajax():
-        message_list = []
-        for message in messages:
+        comment_list = []
+        for comment in comments:
             voted = False
             if 'voted' in request.session:
                 print request.session.get('voted')
-                if str(message.id) in request.session.get('voted'):
+                if str(comment.id) in request.session.get('voted'):
                     voted = True
-            tpl = (message.votes, message.post_date, message.text, voted, str(message.id))
-            message_list.append(tpl)
-        sorted_list = sorted(message_list, key=itemgetter(1,2))
+            tpl = (comment.votes, comment.post_date, comment.text, voted, str(comment.id))
+            comment.append(tpl)
+        sorted_list = sorted(comment_list, key=itemgetter(1,2))
         list_without_dates = []
-        for message in sorted_list:
-            message_without_date = (message[0], message[2], message[3], message[4]) #Somehow python date and json don't play.
-            list_without_dates.append(message_without_date)
+        for comment in sorted_list:
+            comment_without_date = (comment[0], comment[2], comment[3], comment[4]) #Somehow python date and json don't play.
+            list_without_dates.append(comment_without_date)
         json = simplejson.dumps(list_without_dates)
         return HttpResponse(json, mimetype='application/json')
     if request.method == 'POST':
         text = request.POST['comment']
-        message = Message(
+        comment = Comment(
                 text = text,
                 belongs_to = board,
                 post_date = datetime.datetime.now(),
                 votes = 0
             )
-        message.save()
+        comment.save()
     return render_to_response('board.html',
-            {'board': board, 'messages': messages, 'autorefresh': True},
+            {'board': board, 'comments': comments, 'autorefresh': True},
             context_instance = RequestContext(request)
         )
 
 def vote_up(request, comment_id):
     variable_exists = False
-    comment = Message.objects.get(id = comment_id)
+    comment = Comment.objects.get(id = comment_id)
     board = comment.belongs_to
     if 'voted' in request.session:
         variable_exists = True
@@ -135,7 +135,7 @@ def vote_up(request, comment_id):
 
 def vote_down(request, comment_id):
     variable_exists = False
-    comment = Message.objects.get(id = comment_id)
+    comment = Comment.objects.get(id = comment_id)
     board = comment.belongs_to
     if 'voted' in request.session:
         variable_exists = True

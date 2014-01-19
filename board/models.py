@@ -13,7 +13,7 @@ class Board(models.Model):
         url = '/board/' + self.slug
         return url
 
-class Message(models.Model):
+class Comment(models.Model):
     text = models.TextField()
     belongs_to = models.ForeignKey(Board, related_name="messages")
     post_date = models.DateTimeField()

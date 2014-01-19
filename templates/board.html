@@ -24,7 +24,7 @@
     <h1>{{ board.title }}</h1>
 </div>
 
-<div id="messages">
+<div id="comments">
 </div>
 
 {% block scripts %}
@@ -62,37 +62,37 @@
             }
         });
 
-        function getMessages(){
+        function getComments(){
             $.get("{{ board.get_absolute_url }}",
                 {},
-                function(messages) {
+                function(comments) {
                     var msg_html = ''
-                    for (var i=0;i<messages.length;i++)
+                    for (var i=0;i<comments.length;i++)
                     {
                         msg_html += '<div class="panel panel-default"><div class="panel-body">';
-                        msg_html += messages[i][1];
+                        msg_html += comments[i][1];
                         msg_html += '</div><div class="panel-footer" align="right">';
-                        if (messages[i][2] == false)
+                        if (comments[i][2] == false)
                         {
                             msg_html += '<a href="/vote_down/';
-                            msg_html += messages[i][3];
+                            msg_html += comments[i][3];
                             msg_html += '"><span class="glyphicon glyphicon-thumbs-down"></span></a> ';
                         }
-                        msg_html += messages[i][0];
-                        if (messages[i][2] == false)
+                        msg_html += comments[i][0];
+                        if (comments[i][2] == false)
                         {
                             msg_html += ' <a href="/vote_up/';
-                            msg_html += messages[i][3];
+                            msg_html += comments[i][3];
                             msg_html += '"><span class="glyphicon glyphicon-thumbs-up"></span></a>';
                         }
                         msg_html += '</div></div>';
                     };
-                    $("#messages").html(msg_html);
+                    $("#comments").html(msg_html);
                 });
-            setTimeout(function(){getMessages()} ,5000);
+            setTimeout(function(){getComments()} ,5000);
         };
 
-        getMessages();
+        getComments();
     });
 
 
